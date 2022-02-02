@@ -7,6 +7,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,5 +43,24 @@ public class EmployeeServiceImpl implements EmployeeService{
         EmployeeEntity employee = employeeRepository.findById(id).get();
         employeeRepository.delete(employee);
         return true;
+    }
+
+    @Override
+    public Employee getEmployeeById(Long id) {
+        EmployeeEntity employeeEntity = employeeRepository.findById(id).get();
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeEntity,employee);
+        return employee;
+    }
+
+    @Override
+    public Employee updateEmployee(Long id, Employee employee) {
+        EmployeeEntity employeeEntity = employeeRepository.findById(id)
+                .orElseThrow(()->new IllegalStateException("Employee with employee id "+id+" doesn't exist"));
+        employeeEntity.setFirstName(employee.getFirstName());
+        employeeEntity.setLastName(employee.getLastName());
+        employeeEntity.setEmailId(employee.getEmailId());
+        employeeRepository.save(employeeEntity);
+        return employee;
     }
 }
